@@ -1,4 +1,4 @@
-# Fcrepo::Cloud::Migrator
+# FcrepoCloudMigrator
 
 [![Build Status](https://travis-ci.com/nulib/fcrepo-cloud-migrator.svg?branch=master)](https://travis-ci.com/nulib/fcrepo-cloud-migrator)
 
