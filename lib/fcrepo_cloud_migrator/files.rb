@@ -14,9 +14,10 @@ module FcrepoCloudMigrator
     def find_all_files
       [].tap do |fcrepo_file|
         Dir.glob("#{directory}**/*.ttl").map do |file|
-          if contains_ebucore_filename?(file)
+          graph = RDF::Graph.load(file, format: :ttl)
+          if contains_ebucore_filename?(graph)
             fcrepo_file << file
-            FcrepoCloudMigrator.logger.info("#{file} has multiple versions") if multiple_versions?(file)
+            FcrepoCloudMigrator.logger.info("#{file} has multiple versions") if multiple_versions?(graph)
           end
         end
       end
@@ -24,12 +25,12 @@ module FcrepoCloudMigrator
 
     private
 
-      def contains_ebucore_filename?(file)
-        RDF::Graph.load(file, format: :ttl).predicates.map(&:to_s).include?(EBUCORE_FILENAME_PREDICATE)
+      def contains_ebucore_filename?(graph)
+        graph.predicates.map(&:to_s).include?(EBUCORE_FILENAME_PREDICATE)
       end
 
-      def multiple_versions?(file)
-        RDF::Graph.load(file, format: :ttl).predicates.map(&:to_s).include?(FEDORA_HAS_VERSIONS_PREDICATE)
+      def multiple_versions?(graph)
+        graph.predicates.map(&:to_s).include?(FEDORA_HAS_VERSIONS_PREDICATE)
       end
   end
 end
