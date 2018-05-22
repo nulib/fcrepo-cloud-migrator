@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fcrepo/cloud/migrator/files'
 require 'rdf/turtle'
 
