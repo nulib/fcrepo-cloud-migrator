@@ -40,23 +40,20 @@
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
 
 
-<http://sample-repo.edu:1234/fcrepo/rest/nuf/7m/01/bk/73/7m01bk73c/files/5e19909f-8f36-4a8f-b3e0-f4e81c13a587> a ldp:NonRDFSource , ns006:File , ns010:OriginalFile , fedora:Binary , fedora:Resource ;
+<http://sample-repo.edu:1234/fcrepo/rest/nuf/3r/07/4v/01/3r074v01q/files> a fedora:Container , fedora:Resource , ldp:DirectContainer ;
 	fedora:lastModifiedBy "bypassAdmin"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	premis:hasFormatName "JPEG"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	ns012:hashValue "ad76035a4f66d2e6d878b83c437e1dcb"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	ebucore:fileSize "102713"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	premis:hasSize "102713"^^<http://www.w3.org/2001/XMLSchema#long> ;
-	ebucore:hasMimeType "image/jpeg"^^<http://www.w3.org/2001/XMLSchema#string> ;
 	fedora:createdBy "bypassAdmin"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	fedora:created "2017-08-03T15:21:54.848Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
-	premis:hasMessageDigest <urn:sha1:7dc9ca05fd6ae49afde0bc3fa65ae5a6b66b539e> ;
-	fedora:lastModified "2017-08-03T15:23:01.405Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
-	ebucore:filename "Coffee.jpg"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	premis:hasCreatingApplicationVersion "1.0.5"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a ldp:NonRDFSource ;
+	fedora:created "2018-02-26T16:26:23.979Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+	fedora:lastModified "2018-02-26T16:27:05.229Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+	ldp:membershipResource <http://sample-repo.edu:1234/fcrepo/rest/nuf/3r/07/4v/01/3r074v01q> ;
+	ns003:hasModel "ActiveFedora::DirectContainer"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	ldp:hasMemberRelation ns006:hasFile ;
+	a ldp:RDFSource , ldp:Container ;
 	fedora:writable "true"^^<http://www.w3.org/2001/XMLSchema#boolean> ;
-	ns009:describedby <http://sample-repo.edu:1234/fcrepo/rest/nuf/7m/01/bk/73/7m01bk73c/files/5e19909f-8f36-4a8f-b3e0-f4e81c13a587/fcr:metadata> ;
-	fedora:hasParent <http://sample-repo.edu:1234/fcrepo/rest/nuf/7m/01/bk/73/7m01bk73c/files> ;
-	fedora:numberOfChildren "0"^^<http://www.w3.org/2001/XMLSchema#long> ;
-	fedora:hasFixityService <http://sample-repo.edu:1234/fcrepo/rest/nuf/7m/01/bk/73/7m01bk73c/files/5e19909f-8f36-4a8f-b3e0-f4e81c13a587/fcr:fixity> ;
-	fedora:hasVersions <http://sample-repo.edu:1234/fcrepo/rest/nuf/7m/01/bk/73/7m01bk73c/files/5e19909f-8f36-4a8f-b3e0-f4e81c13a587/fcr:versions> .
+	fedora:hasParent <http://sample-repo.edu:1234/fcrepo/rest/nuf/3r/07/4v/01/3r074v01q> ;
+	fedora:numberOfChildren "2"^^<http://www.w3.org/2001/XMLSchema#long> ;
+	ldp:contains <http://sample-repo.edu:1234/fcrepo/rest/nuf/3r/07/4v/01/3r074v01q/files/84df4a72-1149-4438-874d-495aef0d84ca> , <http://sample-repo.edu:1234/fcrepo/rest/nuf/3r/07/4v/01/3r074v01q/files/a0b9b7b5-de28-47eb-a22d-0a71686dc9dd> .
+
+<http://sample-repo.edu:1234/fcrepo/rest/nuf/3r/07/4v/01/3r074v01q/files/fcr:export?format=jcr/xml> dc:format <http://fedora.info/definitions/v4/repository#jcr/xml> .
+
+<http://sample-repo.edu:1234/fcrepo/rest/nuf/3r/07/4v/01/3r074v01q/files> fedora:exportsAs <http://sample-repo.edu:1234/fcrepo/rest/nuf/3r/07/4v/01/3r074v01q/files/fcr:export?format=jcr/xml> .
