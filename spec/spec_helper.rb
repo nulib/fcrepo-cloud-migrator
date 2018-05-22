@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
-require 'fcrepo/cloud/migrator'
+require 'fcrepo_cloud_migrator'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'fcrepo/cloud/migrator/files'
+require 'fcrepo_cloud_migrator/files'
 require 'rdf/turtle'
 
 # 1. gather all the ttl in the export_directory
@@ -9,9 +9,5 @@ require 'rdf/turtle'
 # 4. upload the file and verify hash in process
 # 5. edit ttl and write place
 
-module Fcrepo
-  module Cloud
-    module Migrator
-    end
-  end
+module FcrepoCloudMigrator
 end

@@ -2,11 +2,11 @@
 
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'fcrepo/cloud/migrator/version'
+require 'fcrepo_cloud_migrator/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'fcrepo-cloud-migrator'
-  spec.version       = Fcrepo::Cloud::Migrator::VERSION
+  spec.version       = FcrepoCloudMigrator::VERSION
   spec.authors       = ['Carrick Rogers', 'Brendan Quinn']
   spec.email         = ['carrickr@umich.edu', 'brendan-quinn@northwestern.edu']
 

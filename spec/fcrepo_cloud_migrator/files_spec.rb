@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Fcrepo::Cloud::Migrator::Files do
+RSpec.describe FcrepoCloudMigrator::Files do
   describe '.find_all_files' do
     it 'collects all ttl files containing the ebucore#filename predicate' do
       expect(described_class.new('spec/fixtures/data/').find_all_files)
