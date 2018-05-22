@@ -26,7 +26,7 @@ Metrics/BlockLength:
 RSpec/ExampleLength:
   Enabled: false
 
-Style/FileName:
+Naming/FileName:
   Exclude:
     - '**/Gemfile'
     - '**/*.gemspec'
