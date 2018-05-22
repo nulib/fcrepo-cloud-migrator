@@ -1,5 +1,7 @@
 # Fcrepo::Cloud::Migrator
 
+[![Build Status](https://travis-ci.com/nulib/fcrepo-cloud-migrator.svg?branch=master)](https://travis-ci.com/nulib/fcrepo-cloud-migrator)
+
 **Assumptions**
 1. You have a local fcrepo that is 4.7.x or greater
 1. This local fcrepo contains internal binaries
