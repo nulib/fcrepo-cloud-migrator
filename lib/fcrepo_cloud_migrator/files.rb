@@ -25,17 +25,11 @@ module FcrepoCloudMigrator
     private
 
       def contains_ebucore_filename?(file)
-        RDF::Graph.load(file, format: :ttl).each_statement.any? do |statement|
-          statement.predicate.to_s == EBUCORE_FILENAME_PREDICATE
-        end
+        RDF::Graph.load(file, format: :ttl).predicates.map(&:to_s).include?(EBUCORE_FILENAME_PREDICATE)
       end
 
       def multiple_versions?(file)
-        [].tap do |versions|
-          RDF::Graph.load(file, format: :ttl).each_statement do |statement|
-            versions << statement if statement.predicate.to_s == FEDORA_HAS_VERSIONS_PREDICATE
-          end
-        end.uniq.any?
+        RDF::Graph.load(file, format: :ttl).predicates.map(&:to_s).include?(FEDORA_HAS_VERSIONS_PREDICATE)
       end
   end
 end
