@@ -46,7 +46,7 @@
 	ebucore:hasMimeType "JPEG"^^<http://www.w3.org/2001/XMLSchema#string> ;
 	fedora:createdBy "bypassAdmin"^^<http://www.w3.org/2001/XMLSchema#string> ;
 	fedora:created "2018-02-26T16:26:24.472Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
-	premis:hasMessageDigest <urn:sha1:7dc9ca05fd6ae49afde0bc3fa65ae5a6b66b539e> ;
+	premis:hasMessageDigest <urn:sha1:7a83dcff697efd88d479d8f5d7b8c6a8367fd064> ;
 	fedora:lastModified "2018-02-26T16:26:24.682Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
 	ebucore:filename "COFFEE.jpg"^^<http://www.w3.org/2001/XMLSchema#string> ;
 	a ldp:NonRDFSource ;
