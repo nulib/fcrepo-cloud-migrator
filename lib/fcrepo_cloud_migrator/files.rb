@@ -4,8 +4,7 @@ module FcrepoCloudMigrator
   class Files
     attr_reader :directory
 
-    EBUCORE_FILENAME_PREDICATE    = 'http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename'
-    FEDORA_HAS_VERSIONS_PREDICATE = 'http://fedora.info/definitions/v4/repository#hasVersions'
+    EBUCORE_FILENAME_PREDICATE = 'http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename'
 
     def initialize(directory)
       @directory = directory
@@ -16,8 +15,7 @@ module FcrepoCloudMigrator
         Dir.glob("#{directory}**/*.ttl").map do |file|
           graph = RDF::Graph.load(file, format: :ttl)
           if contains_ebucore_filename?(graph)
-            fcrepo_file << file
-            FcrepoCloudMigrator.logger.info("#{file} has multiple versions") if multiple_versions?(graph)
+            block_given? ? yield(file) : fcrepo_file << file
           end
         end
       end
@@ -27,10 +25,6 @@ module FcrepoCloudMigrator
 
       def contains_ebucore_filename?(graph)
         graph.predicates.map(&:to_s).include?(EBUCORE_FILENAME_PREDICATE)
-      end
-
-      def multiple_versions?(graph)
-        graph.predicates.map(&:to_s).include?(FEDORA_HAS_VERSIONS_PREDICATE)
       end
   end
 end
