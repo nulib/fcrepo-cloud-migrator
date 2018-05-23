@@ -2,6 +2,7 @@
 
 require 'fcrepo_cloud_migrator/files'
 require 'fcrepo_cloud_migrator/binary'
+require 'fcrepo_cloud_migrator/upload'
 require 'fcrepo_cloud_migrator/logging'
 require 'rdf/turtle'
 
