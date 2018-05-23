@@ -3,7 +3,7 @@
 require 'pathname'
 
 module FcrepoCloudMigrator
-  class S3
+  class Binary
     attr_reader :checksum, :file, :graph
 
     EBUCORE_FILENAME_PREDICATE      = 'http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename'
@@ -15,13 +15,7 @@ module FcrepoCloudMigrator
       @checksum    = checksum_from_graph
     end
 
-    def file_extension
-      graph.each_statement do |statement|
-        return File.extname(statement.object.to_s) if statement.predicate.to_s == EBUCORE_FILENAME_PREDICATE
-      end
-    end
-
-    def binary
+    def path
       Pathname("#{Pathname(file).parent.parent}/#{File.basename(Pathname(file).parent)}.binary").to_s
     end
 
