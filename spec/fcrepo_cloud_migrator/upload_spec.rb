@@ -38,6 +38,7 @@ RSpec.describe FcrepoCloudMigrator::Upload do
       before do
         allow(FcrepoCloudMigrator).to receive(:logger).and_return(logger)
         allow(Aws::S3::Bucket).to receive(:new).and_return(obj)
+        allow(Aws::S3::Resource).to receive(:new).and_return(Aws::S3::Resource.new(stub_responses: true))
       end
 
       let(:obj) { instance_spy('obj') }
