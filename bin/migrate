@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
-require 'fcrepo-cloud-migrator'
+require 'bundler/setup'
+require 'fcrepo_cloud_migrator'
 
 def validate_arguments!(bucket, export_directory)
   return if bucket && export_directory
@@ -10,7 +11,10 @@ end
 
 def main(bucket, export_directory)
   validate_arguments!(bucket, export_directory)
-  Fcrepo::Cloud::Migrator.new('foo', '/tmp/arch/').find_all_files
+  FcrepoCloudMigrator::Files.new(directory: export_directory).find_all_files do |file|
+    binary = FcrepoCloudMigrator::Binary.new(file: file)
+    FcrepoCloudMigrator::Upload.new(bucket: bucket, binary: binary).upload_binary
+  end
 end
 
 def usage
