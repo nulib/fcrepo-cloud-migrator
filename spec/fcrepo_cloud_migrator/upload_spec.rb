@@ -33,5 +33,20 @@ RSpec.describe FcrepoCloudMigrator::Upload do
         expect(logger).to have_received(:error).once
       end
     end
+
+    context 'already exists in bucket' do
+      before do
+        allow(FcrepoCloudMigrator).to receive(:logger).and_return(logger)
+        allow(Aws::S3::Bucket).to receive(:new).and_return(obj)
+      end
+
+      let(:obj) { instance_spy('obj') }
+
+      it 'logs when the object already exists in the bucket' do
+        allow(obj).to receive(:exists?).and_return(true)
+        expect(upload.upload_binary).to be_truthy
+        expect(logger).to have_received(:info).once
+      end
+    end
   end
 end

@@ -15,7 +15,12 @@ module FcrepoCloudMigrator
     def upload_binary
       resource = Aws::S3::Resource.new(region: region)
       obj = resource.bucket(bucket).object(binary.checksum_from_graph)
-      obj.upload_file(binary.path)
+      if obj.exists?
+        FcrepoCloudMigrator.logger.info("Skipping upload, #{binary.path} already uploaded as #{binary.checksum_from_graph}")
+        true
+      else
+        obj.upload_file(binary.path)
+      end
     rescue Aws::S3::MultipartUploadError => e
       FcrepoCloudMigrator.logger.error("Failed to multipart upload binary #{binary} with MultipartUploadError #{e.errors}")
       false
