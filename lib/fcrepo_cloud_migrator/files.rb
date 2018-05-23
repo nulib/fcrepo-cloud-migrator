@@ -15,7 +15,7 @@ module FcrepoCloudMigrator
         Dir.glob("#{directory}**/*.ttl").map do |file|
           graph = RDF::Graph.load(file, format: :ttl)
           if contains_ebucore_filename?(graph)
-            block_given? ? yield(file) : fcrepo_file << file
+            block_given? ? yield(file: file, graph: graph) : fcrepo_file << { file: file, graph: graph }
           end
         end
       end
