@@ -6,9 +6,6 @@ module FcrepoCloudMigrator
   class Binary
     attr_reader :checksum, :file, :graph
 
-    EBUCORE_FILENAME_PREDICATE      = 'http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename'
-    PREMIS_MESSAGE_DIGEST_PREDICATE = 'http://www.loc.gov/premis/rdf/v1#hasMessageDigest'
-
     def initialize(file:, graph:)
       @file        = file
       @graph       = graph
