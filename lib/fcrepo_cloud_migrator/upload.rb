@@ -25,7 +25,7 @@ module FcrepoCloudMigrator
       FcrepoCloudMigrator.logger.error("Failed to multipart upload binary #{binary} with MultipartUploadError #{e.errors}")
       false
     rescue => e
-      FcrepoCloudMigrator.logger.error("Failed to upload binary #{binary} with error #{e}")
+      FcrepoCloudMigrator.logger.error("Failed to upload binary #{binary} with error class #{e.class}")
       false
     end
   end
