@@ -9,7 +9,7 @@ RSpec.describe FcrepoCloudMigrator::Metadata do
 
   describe '.graph_with_s3_filenames' do
     it 'modifies the ebucore#filename statement' do
-      expect(ebucore_filename_object(metadata.graph_with_s3_filenames)).to eq 's3://7dc9ca05fd6ae49afde0bc3fa65ae5a6b66b539e'
+      expect(ebucore_filename_object(metadata.graph_with_s3_filenames)).to eq "s3://#{bucket}/7dc9ca05fd6ae49afde0bc3fa65ae5a6b66b539e"
     end
 
     it 'returns the graph unmodified if the ebucore#filename statment is an s3 URI' do

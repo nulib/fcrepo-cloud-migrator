@@ -34,7 +34,7 @@ module FcrepoCloudMigrator
 
       def new_filename_statement
         subject   = filename_subject
-        object    = "s3://#{binary.checksum_from_graph}"
+        object    = "s3://#{bucket}/#{binary.checksum_from_graph}"
         predicate = EBUCORE_FILENAME_PREDICATE
         RDF::Statement.new(subject, predicate, object)
       end

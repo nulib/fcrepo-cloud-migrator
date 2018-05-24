@@ -11,9 +11,14 @@ end
 
 def main(bucket, export_directory)
   validate_arguments!(bucket, export_directory)
-  FcrepoCloudMigrator::Files.new(directory: export_directory).find_all_files do |file|
-    binary = FcrepoCloudMigrator::Binary.new(file: file)
-    FcrepoCloudMigrator::Upload.new(bucket: bucket, binary: binary).upload_binary
+  bucket.sub!(/\/$/, '')
+  FcrepoCloudMigrator::Files.new(directory: export_directory).find_all_files do |record|
+    binary = FcrepoCloudMigrator::Binary.new(file: record[:file], graph: record[:graph])
+    if FcrepoCloudMigrator::Upload.new(bucket: bucket, binary: binary).upload_binary
+      File.open(record[:file], 'w') do |f|
+        f << FcrepoCloudMigrator::Metadata.new(bucket: bucket, binary: binary, file: record[:file], graph: record[:graph]).output
+      end
+    end
   end
 end
 
