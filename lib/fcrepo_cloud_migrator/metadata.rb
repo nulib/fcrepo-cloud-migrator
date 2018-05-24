@@ -12,8 +12,9 @@ module FcrepoCloudMigrator
       @graph  = graph
     end
 
-    def modified_graph
+    def graph_with_s3_filenames
       statement = new_filename_statement
+      return graph if filename_subject.to_s.start_with?('s3://')
 
       remove_filename
       remove_mime_type
@@ -23,7 +24,7 @@ module FcrepoCloudMigrator
 
     def output
       RDF::Turtle::Writer.buffer(prefixes: prefixes) do |writer|
-        modified_graph.each_statement do |statement|
+        graph_with_s3_filenames.each_statement do |statement|
           writer << statement
         end
       end

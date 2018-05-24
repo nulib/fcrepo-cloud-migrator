@@ -7,13 +7,18 @@ RSpec.describe FcrepoCloudMigrator::Metadata do
   let(:graph)    { RDF::Graph.load(file, format: :ttl) }
   let(:metadata) { described_class.new(bucket: bucket, file: file, binary: binary, graph: graph) }
 
-  describe '.modified_graph' do
+  describe '.graph_with_s3_filenames' do
     it 'modifies the ebucore#filename statement' do
-      expect(ebucore_filename_object(metadata.modified_graph)).to eq 's3://7dc9ca05fd6ae49afde0bc3fa65ae5a6b66b539e'
+      expect(ebucore_filename_object(metadata.graph_with_s3_filenames)).to eq 's3://7dc9ca05fd6ae49afde0bc3fa65ae5a6b66b539e'
+    end
+
+    it 'returns the graph unmodified if the ebucore#filename statment is an s3 URI' do
+      allow(metadata).to receive(:filename_subject).and_return(RDF::URI('s3://'))
+      expect(metadata.graph_with_s3_filenames == graph).to be_truthy
     end
 
     it 'removes the ebucore#hasMimeType statement' do
-      expect(has_mimetype?(metadata.modified_graph)).to be_falsey
+      expect(has_mimetype?(metadata.graph_with_s3_filenames)).to be_falsey
     end
   end
 
