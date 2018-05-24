@@ -4,8 +4,6 @@ module FcrepoCloudMigrator
   class Files
     attr_reader :directory
 
-    EBUCORE_FILENAME_PREDICATE = 'http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename'
-
     def initialize(directory:)
       @directory = directory
     end
