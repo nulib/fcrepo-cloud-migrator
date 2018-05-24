@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe FcrepoCloudMigrator::Upload do
-  let(:binary) { FcrepoCloudMigrator::Binary.new(file: 'spec/fixtures/data/01/3r074v01q/files/84df4a72-1149-4438-874d-495aef0d84ca/fcr%3Ametadata.ttl') }
+  let(:binary) { FcrepoCloudMigrator::Binary.new(file: file, graph: graph) }
+  let(:file)   { 'spec/fixtures/data/01/3r074v01q/files/84df4a72-1149-4438-874d-495aef0d84ca/fcr%3Ametadata.ttl' }
+  let(:graph)  { RDF::Graph.load(file, format: :ttl) }
   let(:upload) { described_class.new(bucket: 'mybucket-123', binary: binary) }
   let(:logger) { instance_spy('logger') }
 
