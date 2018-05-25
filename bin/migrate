@@ -11,7 +11,7 @@ end
 
 def main(bucket, export_directory)
   validate_arguments!(bucket, export_directory)
-  bucket.sub!(/\/$/, '')
+  bucket = bucket.sub(/\/$/, '')
   FcrepoCloudMigrator::Files.new(directory: export_directory).find_all_files do |record|
     binary = FcrepoCloudMigrator::Binary.new(file: record[:file], graph: record[:graph])
     if FcrepoCloudMigrator::Upload.new(bucket: bucket, binary: binary).upload_binary
