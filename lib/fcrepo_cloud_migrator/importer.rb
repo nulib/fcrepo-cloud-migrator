@@ -75,9 +75,14 @@ module FcrepoCloudMigrator
       RDF::Graph.new.tap do |graph|
         graph.from_ttl(ttl)
         graph.statements.each do |st|
-          graph.delete(st) if st.predicate.starts_with?(RDF::Vocab::Fcrepo4) ||
-                              st.object.starts_with?(RDF::Vocab::Fcrepo4) ||
-                              st.predicate == RDF::Vocab::LDP.contains
+          graph.delete(st)
+          unless st.predicate.starts_with?(RDF::Vocab::Fcrepo4) ||
+                 st.object.starts_with?(RDF::Vocab::Fcrepo4) ||
+                 st.predicate == RDF::Vocab::LDP.contains ||
+                 !st.subject.to_s.match?(%r{/rest/}) ||
+                 st.subject.to_s.match?(%r{/fcr:})
+            graph << [RDF::URI(''), st.predicate, st.object]
+          end
         end
       end
     end
