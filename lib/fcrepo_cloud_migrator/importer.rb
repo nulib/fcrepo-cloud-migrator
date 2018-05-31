@@ -37,9 +37,8 @@ module FcrepoCloudMigrator
 
     def import(path:)
       logger.info("importing: #{path}")
-      graph = load_file(path: path)
+      graph, resource_path = load_file(path: path)
       return if graph.empty?
-      resource_path = graph.query([:s, RDF::RDFV.type, :o]).first.subject.path
       if binary?(graph)
         import_binary(
           resource_path: resource_path,
@@ -72,8 +71,10 @@ module FcrepoCloudMigrator
 
     def load_file(path:)
       ttl = source.content_for(path).gsub(from, to)
-      RDF::Graph.new.tap do |graph|
+      resource_path = nil
+      g = RDF::Graph.new.tap do |graph|
         graph.from_ttl(ttl)
+        resource_path = graph.query([:s, RDF::RDFV.type, :o]).first.subject.path
         graph.statements.each do |st|
           graph.delete(st)
           unless st.predicate.starts_with?(RDF::Vocab::Fcrepo4) ||
@@ -85,6 +86,7 @@ module FcrepoCloudMigrator
           end
         end
       end
+      [g, resource_path]
     end
 
     def with_transaction
