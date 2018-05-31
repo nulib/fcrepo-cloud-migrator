@@ -8,7 +8,7 @@ module FcrepoCloudMigrator
     end
 
     def ttl_files
-      @ttl_files ||= base_path.glob('**/*.ttl').collect { |p| p.relative_path_from(base_path).to_s } - ['rest.ttl']
+      @ttl_files ||= Pathname.glob(base_path.join('**/*.ttl')).collect { |p| p.relative_path_from(base_path).to_s } - ['rest.ttl']
     end
 
     def io_for(path)
