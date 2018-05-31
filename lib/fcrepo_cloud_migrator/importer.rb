@@ -23,13 +23,15 @@ module FcrepoCloudMigrator
     end
 
     def import_all
-      content_files.each do |file|
-        next if file.match?(%r{/fcr%3Aversion})
-        import(path: file)
-      end
+      with_transaction do
+        content_files.each do |file|
+          next if file.match?(%r{/fcr%3Aversion})
+          import(path: file)
+        end
 
-      access_control_files.each do |file|
-        import(path: file)
+        access_control_files.each do |file|
+          import(path: file)
+        end
       end
     end
 
@@ -42,18 +44,20 @@ module FcrepoCloudMigrator
         import_binary(
           resource_path: resource_path,
           path:          Pathname(path).parent.to_s + '.binary',
-          mime_type:     graph.query([:s, RDF::Vocab::EBUCore.hasMimeType, :o]).first.object.value
+          mime_type:     graph.query([:s, RDF::Vocab::EBUCore.hasMimeType, :o]).first.object.value,
+          checksum:      graph.query([:s, RDF::Vocab::PREMIS.hasMessageDigest, :o]).first.object.value
         )
         resource_path += '/fcr:metadata'
       end
       import_metadata(resource_path: resource_path, graph: graph)
     end
 
-    def import_binary(resource_path:, path:, mime_type:)
+    def import_binary(resource_path:, path:, mime_type:, checksum:)
       logger.info("  binary: #{resource_path}")
       put(resource_path) do |req|
         req.headers['Content-Type']      = mime_type
         req.headers['Transfer-Encoding'] = 'chunked'
+        req.headers['Digest']            = "sha1=#{checksum}"
         req.body                         = source.io_for(path)
       end
     end
@@ -78,7 +82,35 @@ module FcrepoCloudMigrator
       end
     end
 
+    def with_transaction
+      start_transaction
+      yield
+      end_transaction(:commit)
+    rescue StandardError
+      end_transaction(:rollback)
+      raise
+    end
+
     private
+
+      def start_transaction
+        raise 'Transaction in progress' unless @tx_id.nil?
+        resp = conn.post { |req| req.path = '/rest/fcr:tx' }
+        @tx_id = resp.headers['Location'].split(/\//).last
+        logger.info("Beginning transaction #{@tx_id}")
+        logger.info("    #{resp.status}|#{resp.body}")
+      end
+
+      def end_transaction(type)
+        raise 'No transaction in progress' if @tx_id.nil?
+        begin
+          logger.info("#{type} transaction #{@tx_id}")
+          resp = conn.post { |req| req.path = tx_path("/rest/fcr:tx/fcr:#{type}") }
+          logger.info("    #{resp.status}|#{resp.body}")
+        ensure
+          @tx_id = nil
+        end
+      end
 
       def initialize_source(source)
         case source
@@ -91,12 +123,16 @@ module FcrepoCloudMigrator
         end
       end
 
+      def tx_path(resource_path)
+        resource_path.sub(%r{^(/rest)/(.+)$}, '\1/' + @tx_id + '/\2')
+      end
+
       def put(resource_path)
         resp = if @dry_run
                  OpenStruct.new(status: 200, body: resource_path)
                else
                  conn.put do |req|
-                   req.path = resource_path
+                   req.path = tx_path(resource_path)
                    req.headers['Prefer'] = 'handling=lenient; received="minimal"'
                    yield(req)
                  end

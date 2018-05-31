@@ -18,6 +18,7 @@ RSpec.describe FcrepoCloudMigrator::Importer do
 
   it '#import_all' do
     importer.import_all
+    expect(conn).to have_received(:post).exactly(:twice)
     expect(conn).to have_received(:put).exactly(6).times
   end
 end
