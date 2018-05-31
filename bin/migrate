@@ -2,26 +2,26 @@
 require 'bundler/setup'
 require 'fcrepo_cloud_migrator'
 
-def validate_arguments!(bucket, source_url, destination_url)
-  return if bucket && source_url && destination_url
+def validate_arguments!(source, source_url, destination_url)
+  return if source && source_url && destination_url
   usage
-  warn 'Please provide a source bucket, source repo URL, and destination repo URL.'
+  warn 'Please provide a source (/path/to/content or s3://content-bucket/), source repo URL, and destination repo URL.'
   exit(1)
 end
 
-def main(bucket, source_url, destination_url)
-  validate_arguments!(bucket, source_url, destination_url)
-  migrator = FcrepoCloudMigrator.new(
-    bucket:      bucket,
-    source:      source_url,
-    destination: destination_url,
+def main(source, source_url, destination_url)
+  validate_arguments!(source, source_url, destination_url)
+  migrator = FcrepoCloudMigrator::Importer.new(
+    source:      source,
+    from:        source_url,
+    to:          destination_url,
     dry_run:     !!ENV['DRY_RUN']
   )
   migrator.import_all
 end
 
 def usage
-  warn "Usage: #{$PROGRAM_NAME} <source_bucket> <source_repo> <destination_repo>"
+  warn "Usage: #{$PROGRAM_NAME} <source_source> <source_repo> <destination_repo>"
 end
 
-main(ARGV[0], ARGV[1], ARGV[3])
+main(ARGV[0], ARGV[1], ARGV[2])
