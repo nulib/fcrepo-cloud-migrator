@@ -1,17 +1,20 @@
 PATH
   remote: .
   specs:
-    fcrepo-cloud-migrator (0.1.0)
+    fcrepo-cloud-migrator (0.2.0)
       aws-sdk-s3
+      faraday
+      rdf
       rdf-turtle
+      rdf-vocab
 
 GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.0)
     aws-eventstream (1.0.0)
-    aws-partitions (1.87.0)
-    aws-sdk-core (3.21.1)
+    aws-partitions (1.89.1)
+    aws-sdk-core (3.21.2)
       aws-eventstream (~> 1.0)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.0)
@@ -19,8 +22,8 @@ GEM
     aws-sdk-kms (1.5.0)
       aws-sdk-core (~> 3)
       aws-sigv4 (~> 1.0)
-    aws-sdk-s3 (1.12.0)
-      aws-sdk-core (~> 3, >= 3.21.1)
+    aws-sdk-s3 (1.13.0)
+      aws-sdk-core (~> 3, >= 3.21.2)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.0)
     aws-sigv4 (1.0.2)
@@ -33,10 +36,13 @@ GEM
     ebnf (1.1.2)
       rdf (>= 2.2, < 4.0)
       sxp (~> 1.0)
+    faraday (0.15.2)
+      multipart-post (>= 1.2, < 3)
     hamster (3.0.0)
       concurrent-ruby (~> 1.0)
     jmespath (1.4.0)
     link_header (0.0.8)
+    multipart-post (2.0.0)
     parallel (1.12.1)
     parser (2.5.1.0)
       ast (~> 2.4.0)
@@ -48,6 +54,8 @@ GEM
       link_header (~> 0.0, >= 0.0.8)
     rdf-turtle (3.0.1)
       ebnf (~> 1.1)
+      rdf (~> 3.0)
+    rdf-vocab (3.0.2)
       rdf (~> 3.0)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)

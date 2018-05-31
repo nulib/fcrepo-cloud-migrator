@@ -24,7 +24,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'aws-sdk-s3'
+  spec.add_dependency 'rdf'
+  spec.add_dependency 'rdf-vocab'
   spec.add_dependency 'rdf-turtle'
+  spec.add_dependency 'faraday'
 
   spec.add_development_dependency 'bixby'
   spec.add_development_dependency 'bundler', '~> 1.16'

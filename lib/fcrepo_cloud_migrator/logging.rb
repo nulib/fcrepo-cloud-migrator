@@ -3,7 +3,7 @@ require 'logger'
 
 module FcrepoCloudMigrator
   module Logging
-    def self.initialize_logger(log_target = STDOUT)
+    def self.initialize_logger(log_target = STDERR)
       oldlogger = defined?(@logger) ? @logger : nil
       @logger = Logger.new(log_target)
       @logger.level = Logger::INFO

@@ -2,12 +2,6 @@
 
 [![Build Status](https://travis-ci.com/nulib/fcrepo-cloud-migrator.svg?branch=master)](https://travis-ci.com/nulib/fcrepo-cloud-migrator)
 
-**Assumptions**
-1. You have a local fcrepo that is 4.7.x or greater
-1. This local fcrepo contains internal binaries
-1. You have a AWS based fcrepo that is 4.7.x or greater
-1. This AWS fcrepo is configured for [external binaries](https://wiki.duraspace.org/display/FEDORA4x/How+to+add+Use+Amazon+Simple+Scalable+Storage+%28S3%29+for+Storing+Fedora+Content)
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -26,12 +20,17 @@ Or install it yourself as:
 
 ## Usage
 
-###
+### Step-By-Step
 
 1. Install [aws-cli](https://aws.amazon.com/cli/) and [configure your credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
 1. Use [fcrepo-import-export](https://github.com/fcrepo4-labs/fcrepo-import-export) to export your repository with binaries.  This tool is currently tested against [version 0.2.0](https://github.com/fcrepo4-labs/fcrepo-import-export/releases/tag/fcrepo-import-export-0.2.0) of the tool.
-1. Run `command TBD`, this will copy your files to s3 and modify your `.ttl` files to reference external binaries
-1. Use the `fcrepo-import-export` tool with the flags `tbd` to import the modified ttl files into your AWS Fedora
+1. Create an empty Amazon S3 bucket.
+1. Copy the contents of your export directory to the S3 bucket you just created (e.g., using `aws s3 sync`).
+1. Run `bin/migrate <s3_bucket> <source_repo_url> <destination_repo_url>`.
+
+### Simulated Run
+
+Setting the environment variable `DRY_RUN=true` will make the migrator go through the motions without actually making any calls to Fedora.
 
 ## Development
 
