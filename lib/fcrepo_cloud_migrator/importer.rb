@@ -159,7 +159,7 @@ module FcrepoCloudMigrator
         resp = if @dry_run
                  OpenStruct.new(status: 200, body: resource_path)
                else
-                 conn.run_request(method) do |req|
+                 conn.run_request(method, nil, nil, nil) do |req|
                    req.path = tx_path(resource_path)
                    yield(req)
                  end

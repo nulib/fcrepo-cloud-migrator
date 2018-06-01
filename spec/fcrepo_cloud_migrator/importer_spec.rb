@@ -20,7 +20,7 @@ RSpec.describe FcrepoCloudMigrator::Importer do
   it '#import_all' do
     importer.import_all
     # Expect 6 creates and 4 relation updates
-    expect(conn).to have_received(:run_request).with(:put).exactly(6).times
-    expect(conn).to have_received(:run_request).with(:patch).exactly(4).times
+    expect(conn).to have_received(:run_request).with(:put, nil, nil, nil).exactly(6).times
+    expect(conn).to have_received(:run_request).with(:patch, nil, nil, nil).exactly(4).times
   end
 end
