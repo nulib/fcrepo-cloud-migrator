@@ -18,7 +18,7 @@ module FcrepoCloudMigrator
         end
       end
       persist(relations)
-      graph.subjects.first.path
+      Util.resource_path(graph.subjects.first)
     end
 
     def persist(graph)

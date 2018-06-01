@@ -75,7 +75,7 @@ module FcrepoCloudMigrator
     end
 
     def import_relations(graph:)
-      resource_path = graph.subjects.first.path
+      resource_path = Util.resource_path(graph.subjects.first)
       logger.info("  relations: #{resource_path}")
       patch(resource_path) do |req|
         req.headers['Content-Type'] = 'application/sparql-update'
@@ -189,7 +189,7 @@ module FcrepoCloudMigrator
       end
 
       def base_url
-        URI.parse(to).merge('/')
+        to.split(%r{/rest/}).first
       end
 
       def content_files
