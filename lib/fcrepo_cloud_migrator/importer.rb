@@ -12,11 +12,11 @@ module FcrepoCloudMigrator
   class Importer
     attr_reader :source, :from, :to, :relations
 
-    def initialize(source:, from:, to:, dry_run: false)
+    def initialize(source:, from:, to:, relations: nil, dry_run: false)
       @source    = initialize_source(source)
       @from      = from
       @to        = to
-      @relations = FcrepoCloudMigrator::Relations.new(to)
+      @relations = FcrepoCloudMigrator::Relations.new(to, relation_file: relations)
       @dry_run   = dry_run
     end
 
@@ -47,7 +47,7 @@ module FcrepoCloudMigrator
         mime_type = graph.query([:s, RDF::Vocab::EBUCore.hasMimeType, :o]).first.object.value
         checksum = graph.query([:s, RDF::Vocab::PREMIS.hasMessageDigest, :o]).first.object.value.split(/:/).last
         delete_predicates(graph, [RDF::Vocab::PREMIS.hasSize, RDF::Vocab::PREMIS.hasMessageDigest])
-        
+
         import_binary(
           resource_path: resource_path,
           path:          Pathname(path).parent.to_s + '.binary',
@@ -81,9 +81,9 @@ module FcrepoCloudMigrator
     def import_relations(graph:)
       resource_path = Util.resource_path(graph.subjects.first)
       logger.info("  relations: #{resource_path}")
-      patch(resource_path) do |req|
+      patch("#{resource_path}/fcr:metadata") do |req|
         req.headers['Content-Type'] = 'application/sparql-update'
-        req.body                    = sparql(graph)
+        req.body                    = Util.sparql(graph)
       end
     end
 
@@ -116,19 +116,6 @@ module FcrepoCloudMigrator
         graph.statements.each do |st|
           graph.delete(st) if predicates.include?(st.predicate)
         end
-      end
-
-      def sparql(graph)
-        erb = <<~__EOF__
-        INSERT {
-        <% graph.statements.each do |st| -%>
-          <%= ['<>', st.predicate.to_base, st.object.to_base].join(' ') %>
-        <% end -%>
-        }
-        WHERE { }
-        __EOF__
-        template = ERB.new(erb, nil, '-')
-        template.result(OpenStruct.new(graph: graph).instance_eval { binding })
       end
 
       def start_transaction

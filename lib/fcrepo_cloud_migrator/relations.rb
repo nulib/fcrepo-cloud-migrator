@@ -4,8 +4,9 @@ module FcrepoCloudMigrator
     include Enumerable
     attr_accessor :base_url
 
-    def initialize(base_url)
+    def initialize(base_url, relation_file: nil)
       @base_url = base_url
+      @relation_file = relation_file
     end
 
     def extract(graph)
@@ -25,15 +26,22 @@ module FcrepoCloudMigrator
       ::File.open(relation_file, 'a') do |file|
         file.puts(graph.dump(:ntriples))
       end
+      @relation_graph = nil
     end
 
     def each
-      graph = RDF::Graph.load(relation_file)
-      graph.subjects.each do |subject|
+      relation_graph.subjects.sort_by(&:length).reverse.each do |subject|
         RDF::Graph.new do |g|
-          graph.query([subject, :p, :o]).each { |st| g << st }
+          relation_graph.query([subject, :p, :o]).each { |st| g << st }
           yield g
         end
+      end
+    end
+
+    def fetch(subject)
+      subject_uri = RDF::URI(subject)
+      RDF::Graph.new do |g|
+        relation_graph.query([subject_uri, :p, :o]).each { |st| g << st }
       end
     end
 
@@ -42,6 +50,9 @@ module FcrepoCloudMigrator
     end
 
     private
+      def relation_graph
+        @relation_graph ||= RDF::Graph.load(relation_file)
+      end
 
       def exclude?(st)
         st.predicate.starts_with?(RDF::Vocab::Fcrepo4) ||
