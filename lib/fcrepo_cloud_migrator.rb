@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fcrepo_cloud_migrator/importer'
+require 'fcrepo_cloud_migrator/relations'
 require 'fcrepo_cloud_migrator/logging'
 
 module FcrepoCloudMigrator

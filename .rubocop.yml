@@ -24,7 +24,7 @@ Metrics/BlockLength:
     - '*.gemspec'
 
 Metrics/ClassLength:
-  Max: 150
+  Enabled: false
 
 Metrics/MethodLength:
   Max: 20

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'pathname'
+require 'erb'
 require 'rdf'
 require 'rdf/turtle'
 require 'rdf/vocab'
@@ -9,13 +10,14 @@ require 'aws-sdk-s3'
 
 module FcrepoCloudMigrator
   class Importer
-    attr_reader :source, :from, :to
+    attr_reader :source, :from, :to, :relations
 
     def initialize(source:, from:, to:, dry_run: false)
-      @source   = initialize_source(source)
-      @from     = from
-      @to       = to
-      @dry_run  = dry_run
+      @source    = initialize_source(source)
+      @from      = from
+      @to        = to
+      @relations = FcrepoCloudMigrator::Relations.new(to)
+      @dry_run   = dry_run
     end
 
     def logger
@@ -23,15 +25,17 @@ module FcrepoCloudMigrator
     end
 
     def import_all
-      with_transaction do
-        content_files.each do |file|
-          next if file.match?(%r{/fcr%3Aversion})
-          import(path: file)
-        end
+      content_files.each do |file|
+        next if file.match?(%r{/fcr%3Aversion})
+        import(path: file)
+      end
 
-        access_control_files.each do |file|
-          import(path: file)
-        end
+      access_control_files.each do |file|
+        import(path: file)
+      end
+
+      relations.each do |graph|
+        import_relations(graph: graph)
       end
     end
 
@@ -65,7 +69,17 @@ module FcrepoCloudMigrator
       logger.info("  metadata: #{resource_path}")
       put(resource_path) do |req|
         req.headers['Content-Type'] = 'text/turtle'
+        req.headers['Prefer']       = 'handling=lenient; received="minimal"'
         req.body                    = graph.dump(:ttl)
+      end
+    end
+
+    def import_relations(graph:)
+      resource_path = graph.subjects.first.path
+      logger.info("  relations: #{resource_path}")
+      patch(resource_path) do |req|
+        req.headers['Content-Type'] = 'application/sparql-update'
+        req.body                    = sparql(graph)
       end
     end
 
@@ -74,16 +88,10 @@ module FcrepoCloudMigrator
       resource_path = nil
       g = RDF::Graph.new.tap do |graph|
         graph.from_ttl(ttl)
-        resource_path = graph.query([:s, RDF::RDFV.type, :o]).first.subject.path
+        resource_path = relations.extract(graph)
         graph.statements.each do |st|
           graph.delete(st)
-          unless st.predicate.starts_with?(RDF::Vocab::Fcrepo4) ||
-                 st.object.starts_with?(RDF::Vocab::Fcrepo4) ||
-                 st.predicate == RDF::Vocab::LDP.contains ||
-                 !st.subject.to_s.match?(%r{/rest/}) ||
-                 st.subject.to_s.match?(%r{/fcr:})
-            graph << [RDF::URI(''), st.predicate, st.object]
-          end
+          graph << [RDF::URI(''), st.predicate, st.object]
         end
       end
       [g, resource_path]
@@ -99,6 +107,19 @@ module FcrepoCloudMigrator
     end
 
     private
+
+      def sparql(graph)
+        erb = <<~__EOF__
+        INSERT {
+        <% graph.statements.each do |st| -%>
+          <%= ['<>', st.predicate.to_base, st.object.to_base].join(' ') %>
+        <% end -%>
+        }
+        WHERE { }
+        __EOF__
+        template = ERB.new(erb, nil, '-')
+        template.result(OpenStruct.new(graph: graph).instance_eval { binding })
+      end
 
       def start_transaction
         raise 'Transaction in progress' unless @tx_id.nil?
@@ -134,17 +155,28 @@ module FcrepoCloudMigrator
         resource_path.sub(%r{^(/rest)/(.+)$}, '\1/' + @tx_id + '/\2')
       end
 
-      def put(resource_path)
+      def transmit(method, resource_path)
         resp = if @dry_run
                  OpenStruct.new(status: 200, body: resource_path)
                else
-                 conn.put do |req|
+                 conn.run_request(method) do |req|
                    req.path = tx_path(resource_path)
-                   req.headers['Prefer'] = 'handling=lenient; received="minimal"'
                    yield(req)
                  end
                end
         logger.info("    #{resp.status}|#{resp.body}")
+      end
+
+      def patch(resource_path, &block)
+        transmit(:patch, resource_path, &block)
+      end
+
+      def post(resource_path, &block)
+        transmit(:post, resource_path, &block)
+      end
+
+      def put(resource_path, &block)
+        transmit(:put, resource_path, &block)
       end
 
       def conn
