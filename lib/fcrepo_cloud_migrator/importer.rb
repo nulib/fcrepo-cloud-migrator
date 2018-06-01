@@ -44,11 +44,15 @@ module FcrepoCloudMigrator
       graph, resource_path = load_file(path: path)
       return if graph.empty?
       if binary?(graph)
+        mime_type = graph.query([:s, RDF::Vocab::EBUCore.hasMimeType, :o]).first.object.value
+        checksum = graph.query([:s, RDF::Vocab::PREMIS.hasMessageDigest, :o]).first.object.value.split(/:/).last
+        delete_predicates(graph, [RDF::Vocab::PREMIS.hasSize, RDF::Vocab::PREMIS.hasMessageDigest])
+        
         import_binary(
           resource_path: resource_path,
           path:          Pathname(path).parent.to_s + '.binary',
-          mime_type:     graph.query([:s, RDF::Vocab::EBUCore.hasMimeType, :o]).first.object.value,
-          checksum:      graph.query([:s, RDF::Vocab::PREMIS.hasMessageDigest, :o]).first.object.value
+          mime_type:     mime_type,
+          checksum:      checksum
         )
         resource_path += '/fcr:metadata'
       end
@@ -107,6 +111,12 @@ module FcrepoCloudMigrator
     end
 
     private
+
+      def delete_predicates(graph, predicates)
+        graph.statements.each do |st|
+          graph.delete(st) if predicates.include?(st.predicate)
+        end
+      end
 
       def sparql(graph)
         erb = <<~__EOF__
