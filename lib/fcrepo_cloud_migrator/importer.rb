@@ -152,6 +152,7 @@ module FcrepoCloudMigrator
       end
 
       def tx_path(resource_path)
+        return resource_path if @tx_id.nil?
         resource_path.sub(%r{^(/rest)/(.+)$}, '\1/' + @tx_id + '/\2')
       end
 
