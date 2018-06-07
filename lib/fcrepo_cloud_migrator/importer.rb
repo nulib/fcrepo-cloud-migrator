@@ -46,7 +46,7 @@ module FcrepoCloudMigrator
       if binary?(graph)
         mime_type = graph.query([:s, RDF::Vocab::EBUCore.hasMimeType, :o]).first.object.value
         checksum = graph.query([:s, RDF::Vocab::PREMIS.hasMessageDigest, :o]).first.object.value.split(/:/).last
-        delete_predicates(graph, [RDF::Vocab::PREMIS.hasSize, RDF::Vocab::PREMIS.hasMessageDigest])
+        delete_predicates(graph, [RDF::Vocab::PREMIS.hasSize, RDF::Vocab::PREMIS.hasMessageDigest, RDF::Vocab::IANA.describedby])
 
         import_binary(
           resource_path: resource_path,
@@ -99,6 +99,18 @@ module FcrepoCloudMigrator
         end
       end
       [g, resource_path]
+    end
+
+    def patch(resource_path, &block)
+      transmit(:patch, resource_path, &block)
+    end
+
+    def post(resource_path, &block)
+      transmit(:post, resource_path, &block)
+    end
+
+    def put(resource_path, &block)
+      transmit(:put, resource_path, &block)
     end
 
     def with_transaction
@@ -163,18 +175,6 @@ module FcrepoCloudMigrator
                  end
                end
         logger.info("    #{resp.status}|#{resp.body}")
-      end
-
-      def patch(resource_path, &block)
-        transmit(:patch, resource_path, &block)
-      end
-
-      def post(resource_path, &block)
-        transmit(:post, resource_path, &block)
-      end
-
-      def put(resource_path, &block)
-        transmit(:put, resource_path, &block)
       end
 
       def conn
