@@ -58,6 +58,7 @@ module FcrepoCloudMigrator
         st.predicate.starts_with?(RDF::Vocab::Fcrepo4) ||
           st.object.starts_with?(RDF::Vocab::Fcrepo4) ||
           st.predicate == RDF::Vocab::LDP.contains ||
+          (st.predicate == RDF::RDFV.type && st.object.starts_with?(RDF::Vocab::LDP)) ||
           !st.subject.to_s.match?(%r{/rest/}) ||
           st.subject.to_s.match?(%r{/fcr:})
       end

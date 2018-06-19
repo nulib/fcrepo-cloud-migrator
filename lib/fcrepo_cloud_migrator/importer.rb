@@ -54,6 +54,12 @@ module FcrepoCloudMigrator
           mime_type:     mime_type,
           checksum:      checksum
         )
+        
+        new_subject = RDF::URI(URI(to).merge("/").merge(resource_path))
+        graph.statements.each do |st|
+          graph.delete(st)
+          graph << [RDF::URI(new_subject), st.predicate, st.object]
+        end
         resource_path += '/fcr:metadata'
       end
       import_metadata(resource_path: resource_path, graph: graph)
@@ -175,6 +181,7 @@ module FcrepoCloudMigrator
                  end
                end
         logger.info("    #{resp.status}|#{resp.body}")
+        resp
       end
 
       def conn
