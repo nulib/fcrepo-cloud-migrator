@@ -28,7 +28,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rdf-vocab'
   spec.add_dependency 'rdf-turtle'
   spec.add_dependency 'faraday'
-
+  spec.add_dependency 'json'
+  
   spec.add_development_dependency 'bixby'
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'pry-byebug'
