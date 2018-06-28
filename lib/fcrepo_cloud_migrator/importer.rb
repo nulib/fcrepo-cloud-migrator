@@ -3,6 +3,7 @@
 require 'pathname'
 require 'erb'
 require 'rdf'
+require 'rdf/ntriples'
 require 'rdf/turtle'
 require 'rdf/vocab'
 require 'faraday'
@@ -10,14 +11,15 @@ require 'aws-sdk-s3'
 
 module FcrepoCloudMigrator
   class Importer
-    attr_reader :source, :from, :to, :relations
+    attr_reader :source, :from, :to, :relations, :file_format
 
-    def initialize(source:, from:, to:, relations: nil, dry_run: false)
-      @source    = initialize_source(source)
-      @from      = from
-      @to        = to
-      @relations = FcrepoCloudMigrator::Relations.new(to, relation_file: relations)
-      @dry_run   = dry_run
+    def initialize(source:, from:, to:, file_format: :ttl, relations: nil, dry_run: false)
+      @source      = initialize_source(source, file_format)
+      @file_format = file_format
+      @from        = from
+      @to          = to
+      @relations   = FcrepoCloudMigrator::Relations.new(to, relation_file: relations)
+      @dry_run     = dry_run
     end
 
     def logger
@@ -54,7 +56,7 @@ module FcrepoCloudMigrator
           mime_type:     mime_type,
           checksum:      checksum
         )
-        
+
         new_subject = RDF::URI(URI(to).merge("/").merge(resource_path))
         graph.statements.each do |st|
           graph.delete(st)
@@ -94,17 +96,18 @@ module FcrepoCloudMigrator
     end
 
     def load_file(path:)
-      ttl = source.content_for(path).gsub(from, to)
+      content = source.content_for(path).gsub(from, to)
       resource_path = nil
-      g = RDF::Graph.new.tap do |graph|
-        graph.from_ttl(ttl)
+      graph = RDF::Graph.new
+      RDF::Reader.for(file_extension: file_format.to_s).new(content) do |reader|
+        reader.each_statement { |st| graph << st }
         resource_path = relations.extract(graph)
         graph.statements.each do |st|
           graph.delete(st)
           graph << [RDF::URI(''), st.predicate, st.object]
         end
       end
-      [g, resource_path]
+      [graph, resource_path]
     end
 
     def patch(resource_path, &block)
@@ -155,14 +158,14 @@ module FcrepoCloudMigrator
         end
       end
 
-      def initialize_source(source)
+      def initialize_source(source, file_format)
         case source
         when /^s3:/
           require 'fcrepo_cloud_migrator/s3'
-          FcrepoCloudMigrator::S3.new(source)
+          FcrepoCloudMigrator::S3.new(source, file_format)
         else
           require 'fcrepo_cloud_migrator/file'
-          FcrepoCloudMigrator::File.new(source)
+          FcrepoCloudMigrator::File.new(source, file_format)
         end
       end
 
@@ -197,15 +200,15 @@ module FcrepoCloudMigrator
       end
 
       def content_files
-        @content_files ||= (ttl_files - access_control_files).sort_by(&:length)
+        @content_files ||= (all_files - access_control_files).sort_by(&:length)
       end
 
       def access_control_files
-        @access_control_files ||= ttl_files.select { |path| path.match?(/[a-f0-9-]{36}.ttl$/) }.sort_by(&:length)
+        @access_control_files ||= all_files.select { |path| path.match?(/[a-f0-9-]{36}.#{file_format}$/) }.sort_by(&:length)
       end
 
-      def ttl_files
-        source.ttl_files
+      def all_files
+        source.all_files
       end
   end
 end
